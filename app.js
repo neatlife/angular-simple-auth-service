@@ -13,8 +13,9 @@
 
         authService.login = function(credentials) {
             return $http
-                .post('/login', credentials)
-                .then(function(res) {
+            .post('/user.json', credentials)
+            .then(function(res) {
+                console.log(res);
                 Session.create(res.data.id, res.data.user.id);
                 return res.data.user;
             });
@@ -57,15 +58,28 @@
     angular.module('app').controller('AppCtrl', AppCtrl);
     angular.module('app').controller('SigninCtrl', SigninCtrl);
 
-    function AppCtrl() {
+    function AppCtrl($scope, AuthService) {
+        $scope.currentUser = null;
+        $scope.isAuthorized = AuthService.isAuthorized;
+
+        $scope.setCurrentUser = function (user) {
+          $scope.currentUser = user;
+        };
         //alert('aa');
     }
 
-    function SigninCtrl($scope, AuthService) {
-        console.log(AuthService);
-        $scope.login = function() {
-            alert('signin');
-            
+    function SigninCtrl($rootScope, $scope, AuthService, AUTH_EVENTS) {
+        $scope.credentials = {
+            username: '',
+            password: ''
+        };
+        $scope.login = function(credentials) {
+            AuthService.login(credentials).then(function (user) {
+                $rootScope.$broadcast(AUTH_EVENTS.loginSuccess);
+                $scope.setCurrentUser(user);
+            }, function () {
+                $rootScope.$broadcast(AUTH_EVENTS.loginFailed);
+            });
         }
     }
 }();
