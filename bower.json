@@ -1,0 +1,16 @@
+{
+  "name": "AngularAuth",
+  "description": "AngularJS Auth",
+  "homepage": "",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular": "latest",
+    "angular-animate": "latest",
+    "angular-ui-router": "~0.2.11"
+  }
+}
