@@ -13,8 +13,8 @@
 
         authService.login = function(credentials) {
             return $http
-            .post('/user.json', credentials)
-            .then(function(res) {
+                .post('/user.json', credentials)
+                .then(function(res) {
                 console.log(res);
                 Session.create(res.data.id, res.data.user.id);
                 return res.data.user;
@@ -37,22 +37,34 @@
             this.userId = null;
         };
     })
-    .run(function() {
-        console.log('hallo');
+        .run(function($rootScope, AUTH_EVENTS, AuthService) {
+        $rootScope.$on('$stateChangeStart', function(event, next) {
+            if (next.signin == 'signin') {
+                return;
+            }
+            if (!AuthService.isAuthenticated()) {
+                //event.preventDefault();
+                // user is not logged in
+                $rootScope.$broadcast(AUTH_EVENTS.notAuthenticated);
+            }
+        });
     });
-    
-    config.$inject =  ['$stateProvider', '$urlRouterProvider'];
-    function config($stateProvider,   $urlRouterProvider) {
+
+    config.$inject = ['$stateProvider', '$urlRouterProvider'];
+
+    function config($stateProvider, $urlRouterProvider) {
         $urlRouterProvider
             .otherwise('/signin');
 
         $stateProvider
             .state('signin', {
-              url: '/signin',
-              templateUrl: 'signin.html',
-              data : { title: '登录' },
-              controller: "SigninCtrl"
-            });
+            url: '/signin',
+            templateUrl: 'signin.html',
+            data: {
+                title: '登录'
+            },
+            controller: "SigninCtrl"
+        });
     }
 
     angular.module('app').controller('AppCtrl', AppCtrl);
@@ -62,8 +74,8 @@
         $scope.currentUser = null;
         $scope.isAuthorized = AuthService.isAuthorized;
 
-        $scope.setCurrentUser = function (user) {
-          $scope.currentUser = user;
+        $scope.setCurrentUser = function(user) {
+            $scope.currentUser = user;
         };
         //alert('aa');
     }
@@ -74,10 +86,10 @@
             password: ''
         };
         $scope.login = function(credentials) {
-            AuthService.login(credentials).then(function (user) {
+            AuthService.login(credentials).then(function(user) {
                 $rootScope.$broadcast(AUTH_EVENTS.loginSuccess);
                 $scope.setCurrentUser(user);
-            }, function () {
+            }, function() {
                 $rootScope.$broadcast(AUTH_EVENTS.loginFailed);
             });
         }

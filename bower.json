@@ -10,7 +10,6 @@
   ],
   "dependencies": {
     "angular": "latest",
-    "angular-animate": "latest",
     "angular-ui-router": "~0.2.11"
   }
 }
